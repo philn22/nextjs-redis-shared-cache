@@ -1,0 +1,38 @@
+version: "3.8"
+
+services:
+  app1:
+    build:
+      context: .
+    volumes:
+      - cache_volume:/app/shared-cache
+    env_file:
+      - ./.env.local
+    ports:
+      - "3001:3000"
+    networks:
+      - default_network
+
+  app2:
+    build:
+      context: .
+    volumes:
+      - cache_volume:/app/shared-cache
+    env_file:
+      - ./.env.local
+    ports:
+      - "3002:3000"
+    networks:
+      - default_network
+
+volumes:
+  cache_volume:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ../cache_volume
+
+networks:
+  default_network:
+    driver: bridge

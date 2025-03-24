@@ -15,8 +15,9 @@ RUN pnpm build
 FROM node:20-alpine AS runner
  
 WORKDIR /app
- 
-COPY --from=builder /app/cache-handler.mjs .
+
+COPY --from=builder /app/shared-cache  .
+COPY --from=builder /app/cache-handler.mjs /app/cache-handler.local.mjs ./
 COPY --from=builder /app/next.config.ts .
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
