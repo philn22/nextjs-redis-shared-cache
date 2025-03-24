@@ -41,25 +41,24 @@ CacheHandler.onCreation(async () => {
   }
 
   /** @type {import("@neshca/cache-handler").Handler | null} */
-  let redisHandler;
+  let handler;
 
   if (client?.isReady) {
-    redisHandler = await createRedisHandler({
+    handler = await createRedisHandler({
       client,
       keyPrefix: "prefix:", // Do not use a dynamic and unique prefix for each Next.js build because it will create unique cache data for each instance of Next.js, and the cache will not be shared.
       timeoutMs: 1000,
     });
-  } else {
-    // Fallback to LRU handler if Redis client is not available.
-    // The application will still work, but the cache will be in memory only and not shared.
-    redisHandler = createLruHandler();
-    console.warn(
-      "Falling back to LRU handler because Redis client is not available."
-    );
   }
+  // Fallback to LRU handler if Redis client is not available.
+  // The application will still work, but the cache will be in memory only and not shared.
+  const lruHandler = createLruHandler();
+  console.warn(
+    "Falling back to LRU handler because Redis client is not available."
+  );
 
   return {
-    handlers: [redisHandler],
+    handlers: [handler, lruHandler],
     ttl: {
       defaultStaleAge: parseInt(REVALIDATE_TIME) ?? 60,
       estimateExpireAge: (staleAge) => staleAge,
